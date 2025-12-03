@@ -5,15 +5,35 @@ import plotly.express as px
 st.title("FEMA Disaster Relief Dashboard")
 st.write("Authors: Nahisha Ashraf & Jessica Groyon")
 
-# Load the FEMA CSV that you committed to the repo
-df = pd.read_csv(
-    "https://storage.googleapis.com/info_450/IndividualAssistanceHousingRegistrantsLargeDisasters%20(1).csv"
-)
+# -------- Load data (cached & trimmed so the app doesn't crash) --------
+@st.cache_data
+def load_data():
+    url = "https://storage.googleapis.com/info_450/IndividualAssistanceHousingRegistrantsLargeDisasters%20(1).csv"
 
+    # Only keep the columns we actually need for this dashboard
+    use_cols = ["repairAmount", "tsaEligible"]
+    df = pd.read_csv(url, usecols=use_cols)
 
+    # Drop rows where repairAmount or tsaEligible is missing
+    df = df.dropna(subset=["repairAmount", "tsaEligible"])
+
+    # Convert repairAmount to numeric just in case
+    df["repairAmount"] = pd.to_numeric(df["repairAmount"], errors="coerce")
+    df = df.dropna(subset=["repairAmount"])
+
+    # Optional: sample to keep the charts fast & safe
+    if len(df) > 200_000:
+        df = df.sample(200_000, random_state=42)
+
+    return df
+
+df = load_data()
+
+# -------- Data preview --------
 st.subheader("Data Preview")
 st.write(df.head())
 
+# -------- Histogram of repairAmount --------
 st.subheader("Histogram of Repair Amount")
 fig_hist = px.histogram(
     df,
@@ -21,8 +41,9 @@ fig_hist = px.histogram(
     nbins=30,
     title="Distribution of Repair Amounts"
 )
-st.plotly_chart(fig_hist)
+st.plotly_chart(fig_hist, use_container_width=True)
 
+# -------- Boxplot of repairAmount by tsaEligible --------
 st.subheader("Boxplot: Repair Amount by TSA Eligibility")
 fig_box = px.box(
     df,
@@ -34,4 +55,12 @@ fig_box = px.box(
         "repairAmount": "Repair Amount"
     }
 )
-st.plotly_chart(fig_box)
+st.plotly_chart(fig_box, use_container_width=True)
+
+# -------- Optional short text insight --------
+st.markdown(
+    """
+    **Insight:** TSA-eligible households tend to have higher repair amounts on average than non-eligible
+    households, which fits FEMA's goal of prioritizing applicants with more severe housing damage.
+    """
+)
