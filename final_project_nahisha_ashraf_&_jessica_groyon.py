@@ -344,47 +344,30 @@ Required Tasks:
 4. Provide a screenshot or embedded figure of your dashboard
 """
 
-try:
-  import streamlit as st
-except ModuleNotFoundError:
-  import os
-  os.system('pip install streamlit')
-  import streamlit as st
-
-!pip install streamlit
+import streamlit as st
+import pandas as pd
+import plotly.express as px
 
 st.title("FEMA Disaster Relief Dashboard")
 st.write("Authors: Nahisha Ashraf & Jessica Groyon")
 
-# --- Load FEMA dataset ---
-#option 1
 df = pd.read_csv("IndividualAssistanceHousingRegistrantsLargeDisasters.csv")
 
 st.subheader("Data Preview")
 st.write(df.head())
 
-# --- Histogram of Repair Amount ---
 st.subheader("Histogram of Repair Amount")
-fig_hist = px.histogram(
-    df,
-    x="repairAmount",
-    nbins=30,
-    title="Distribution of Repair Amounts"
-)
+fig_hist = px.histogram(df, x="repairAmount", nbins=30,
+                        title="Distribution of Repair Amounts")
 st.plotly_chart(fig_hist)
 
-# --- Boxplot of Repair Amount by TSA Eligibility ---
 st.subheader("Boxplot: Repair Amount by TSA Eligibility")
 fig_box = px.box(
     df,
     x="tsaEligible",
     y="repairAmount",
     title="Repair Amount by TSA Eligibility",
-    labels={
-        "tsaEligible": "TSA Eligible (1 = Yes, 0 = No)",
-        "repairAmount": "Repair Amount"
-    }
+    labels={"tsaEligible": "TSA Eligible (1 = Yes, 0 = No)",
+            "repairAmount": "Repair Amount"}
 )
 st.plotly_chart(fig_box)
-
-"""To build the Streamlit dashboard, we first imported Streamlit and installed it using the code provided in the project guidelines. The code first loads the FEMA dataset and displays a small preview so users can see the structure of the data. Then, it provides two visualizations. The first is a histogram showing the distribution of repairAmount to show the repair costs across applicants. The second is a boxplot comparing repairAmount between TSA-eligible and non-eligible households. These charts help FEMA analysts explore patterns in the data."""
