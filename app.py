@@ -6,7 +6,10 @@ st.title("FEMA Disaster Relief Dashboard")
 st.write("Authors: Nahisha Ashraf & Jessica Groyon")
 
 # Load the FEMA CSV that you committed to the repo
-df = pd.read_csv("IndividualAssistanceHousingRegistrantsLargeDisasters.csv")
+df = pd.read_csv(
+    "https://storage.googleapis.com/info_450/IndividualAssistanceHousingRegistrantsLargeDisasters%20(1).csv"
+)
+
 
 st.subheader("Data Preview")
 st.write(df.head())
